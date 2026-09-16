@@ -43,32 +43,64 @@ The application allows users to log in, select a movie category, choose a movie,
 
 ## 🗄️ Database Schema
 
-The application uses four main tables:
+The application uses four main tables. The column names below are the names referenced by the application’s SQL statements and data-access code. Confirm the suggested data types and constraints against the database used by the application.
 
 ### `Tbl_User`
 
 Stores user login information and the user ID used during a booking.
 
+| Column name | Suggested SQL Server type | Description |
+|---|---|---|
+| `User_ID` | `int` | Primary key and user identifier stored in `Session["uid"]`. |
+| `User_Name` | `nvarchar(100)` | User login name or display name. |
+| `User_Password` | `nvarchar(255)` | Password value; store a strong password hash in production. |
+
+> If the login query uses additional user columns, such as `User_Email`, document those columns here and keep their names synchronized with the query.
+
 ### `Tbl_Movie_Category`
 
 Stores movie categories such as Action, Drama, Comedy, or Animation.
 
+| Column name | Suggested SQL Server type | Description |
+|---|---|---|
+| `Cat_ID` | `int` | Primary key; referenced by `Tbl_Movie.Cat_ID` and `Tbl_Booking.Cat_ID`. |
+| `Cat_Name` | `nvarchar(100)` | Category name displayed in the category dropdown. |
+
 ### `Tbl_Movie`
 
-Stores movie information, its category relationship, and ticket rate. The category relationship is represented by `Cat_ID`.
+Stores movie information, its category relationship, and ticket rate.
+
+| Column name | Suggested SQL Server type | Description |
+|---|---|---|
+| `Movie_ID` | `int` | Primary key; referenced by `Tbl_Booking.Movie_ID`. |
+| `Movie_Name` | `nvarchar(200)` | Movie title. |
+| `Cat_ID` | `int` | Foreign key to `Tbl_Movie_Category.Cat_ID`. |
+| `Rate` | `decimal(10,2)` | Ticket rate used to calculate the booking amount. |
 
 ### `Tbl_Booking`
 
-Stores booking information, including:
+Stores booking information and the values used to calculate the total amount.
 
-- `User_ID`
-- `Cat_ID`
-- `Movie_ID`
-- Number of tickets
-- Ticket rate
-- Total amount
+| Column name | Suggested SQL Server type | Description |
+|---|---|---|
+| `Booking_ID` | `int` | Primary key; an identity column is recommended. |
+| `User_ID` | `int` | Foreign key to `Tbl_User.User_ID`. |
+| `Cat_ID` | `int` | Foreign key to `Tbl_Movie_Category.Cat_ID`. |
+| `Movie_ID` | `int` | Foreign key to `Tbl_Movie.Movie_ID`. |
+| `Tickets` | `int` | Number of tickets; should be greater than zero. |
+| `Rate` | `decimal(10,2)` | Ticket rate captured for the booking, if this column exists in the database. |
+| `Amount` | `decimal(12,2)` | Total booking amount: `Rate × Tickets`. |
 
-The exact column names and data types should match the database used by the application and the SQL statements in the data-access class.
+The booking `INSERT` example used by this application explicitly references `User_ID`, `Cat_ID`, `Movie_ID`, `Tickets`, and `Amount`. Add `Rate` to the booking table and its SQL statements only if the database and data-access code store the rate with each booking.
+
+Recommended relationships:
+
+```text
+Tbl_Movie_Category.Cat_ID  1 ──── * Tbl_Movie.Cat_ID
+Tbl_User.User_ID           1 ──── * Tbl_Booking.User_ID
+Tbl_Movie_Category.Cat_ID  1 ──── * Tbl_Booking.Cat_ID
+Tbl_Movie.Movie_ID         1 ──── * Tbl_Booking.Movie_ID
+```
 
 ---
 
@@ -152,13 +184,7 @@ Parameterized commands help prevent SQL injection and correctly handle values se
 
 For a `SELECT` operation, `SqlDataReader` reads the result one row at a time. The data-access class maps each field to a model object, places the objects in a list, and returns that list to the controller.
 
-This is used for operations such as:
-
-- Loading all bookings
-- Loading movie categories
-- Loading movies for a selected category
-- Loading a booking for editing
-- Checking login details
+This is used for operations such as loading all bookings, loading movie categories, loading movies for a selected category, loading a booking for editing, and checking login details.
 
 ### 5. Insert, update, and delete operations
 
@@ -261,7 +287,7 @@ cd booking_management
 
 Open the root `Web.config` file and update the connection string named `constr` for your environment.
 
-For SQL Server LocalDB, an application-relative configuration is preferable to a computer-specific absolute path:
+For SQL Server LocalDB:
 
 ```xml
 <connectionStrings>
@@ -271,7 +297,7 @@ For SQL Server LocalDB, an application-relative configuration is preferable to a
 </connectionStrings>
 ```
 
-For an existing SQL Server database, use a configuration similar to this example and replace the server and database names:
+For an existing SQL Server database:
 
 ```xml
 <connectionStrings>
