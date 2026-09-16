@@ -374,14 +374,3 @@ This repository README does not assume a particular seed script. If you add a SQ
 
 ---
 
-## 📄 License
-
-No license has been specified for this repository. Add a `LICENSE` file and update this section if you intend to distribute the project under a specific open-source license.
-
-## 🤝 Contributing
-
-1. Create a feature branch.
-2. Make a focused change.
-3. Test the application locally.
-4. Update the README when behavior or setup requirements change.
-5. Open a pull request with a clear description of the change.
