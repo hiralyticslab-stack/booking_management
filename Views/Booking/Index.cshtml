@@ -1,0 +1,86 @@
+﻿@model IEnumerable<booking_mgmt.Models.Booking>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+@using (Html.BeginForm("Index", "Booking", FormMethod.Get, new { @class = "form-inline", style = "margin-bottom: 20px;" }))
+{
+    <div class="form-group">
+        <label for="catId" style="margin-right: 10px;">Filter by Category:</label>
+        @Html.DropDownList("catId", (IEnumerable<SelectListItem>)ViewBag.CatList, "-- All Categories --", new { @class = "form-control", style = "margin-right: 10px;" })
+    </div>
+    <button type="submit" class="btn btn-info">Search</button>
+    @Html.ActionLink("Reset", "Index", null, new { @class = "btn btn-default", style = "margin-left: 5px;" })
+}
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>Booking ID</th>
+        <th>User ID</th>
+        <th>Category</th>
+        <th>Movie</th>
+        <th>Rate</th>
+        <th>No. of Tickets</th>
+        <th>Total Amount</th>
+        <th>Actions</th>
+    </tr>
+    @*<tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Booking_ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User_ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cat_ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movie_ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.No_of_tickets)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th></th>
+        </tr>*@
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Booking_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User_ID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cat_Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Movie_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Rate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.No_of_tickets)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Booking_ID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Booking_ID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Booking_ID }, new { onclick = "return confirm('Are you sure you want to delete this booking?');" })
+            </td>
+        </tr>
+    }
+
+</table>

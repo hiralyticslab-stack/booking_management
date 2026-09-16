@@ -1,0 +1,65 @@
+﻿@model booking_mgmt.Models.Movie
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    @*<h4>Movie</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Movie_ID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Movie_ID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Movie_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Movie_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Release_Date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Release_Date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Cat_ID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Cat_ID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Rate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Rate)
+        </dd>
+
+    </dl>*@
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

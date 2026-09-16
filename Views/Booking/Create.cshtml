@@ -1,0 +1,143 @@
+﻿@model booking_mgmt.Models.Booking
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Booking</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.Booking_ID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Booking_ID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Booking_ID, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.User_ID, "User ID", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.User_ID, new { @class = "form-control", @readonly = "readonly" })
+            @Html.ValidationMessageFor(model => model.User_ID, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Cat_ID, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @*@Html.EditorFor(model => model.Cat_ID, new { htmlAttributes = new { @class = "form-control" } })*@
+            @*@Html.ValidationMessageFor(model => model.Cat_ID, "", new { @class = "text-danger" })*@
+            @Html.DropDownListFor(model => model.Cat_ID, Model.Categories, "-- Select Category --", new { @class = "form-control", id = "Cat_ID", required = "required" })
+            @Html.ValidationMessageFor(model => model.Cat_ID, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Movie_ID, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @*@Html.EditorFor(model => model.Movie_ID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Movie_ID, "", new { @class = "text-danger" })*@
+            @Html.DropDownListFor(model => model.Movie_ID, Model.Movies, "-- Select Movie --", new { @class = "form-control", id = "Movie_ID", required = "required" })
+            @Html.ValidationMessageFor(model => model.Movie_ID, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Rate (per ticket)</label>
+        <div class="col-md-10">
+            <input type="text" id="txtRate" class="form-control" readonly="readonly" value="0" />
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.No_of_tickets, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.No_of_tickets, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.No_of_tickets, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control", id = "txtAmount", @readonly = "readonly" } })
+            @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // 1. Load Movies dynamically on Category Change
+            $("#Cat_ID").change(function () {
+                var catId = $(this).val();
+
+                // Clear downstream fields
+                $("#Movie_ID").empty().append('<option value="">-- Select Movie --</option>');
+                $("#txtRate").val(0);
+                $("#txtAmount").val(0);
+
+                if (catId !== "") {
+                    $.ajax({
+                        url: '@Url.Action("GetMoviesByCategory", "Booking")',
+                        type: 'GET',
+                        data: { catId: catId },
+                        success: function (data) {
+                            $.each(data, function (i, movie) {
+                                $("#Movie_ID").append(
+                                    $('<option></option>')
+                                        .val(movie.Value)
+                                        .html(movie.Text)
+                                        .attr('data-rate', movie.Rate)
+                                );
+                            });
+                        },
+                        error: function () {
+                            alert("Error loading movies.");
+                        }
+                    });
+                }
+            });
+
+            // 2. Extract Rate on Movie Selection change
+            $("#Movie_ID").change(function () {
+                var selectedOption = $(this).find('option:selected');
+                var rate = parseFloat(selectedOption.attr('data-rate')) || 0;
+                $("#txtRate").val(rate);
+                calculateTotal();
+            });
+
+            // 3. Recalculate Total on Ticket Input change
+            $("#txtTickets").on('input change', function () {
+                calculateTotal();
+            });
+
+            function calculateTotal() {
+                var rate = parseFloat($("#txtRate").val()) || 0;
+                var tickets = parseInt($("#txtTickets").val()) || 0;
+                $("#txtAmount").val(rate * tickets);
+            }
+        });
+    </script>
+}
